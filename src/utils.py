@@ -1,5 +1,5 @@
 """
-this file could contain custom exceptions that we want to raise in the project.
+this file could contain all functions that we want to use  in the project.
 e.g.
 def function_name(parameter_name):
     local_variable=0
@@ -8,6 +8,9 @@ def function_name(parameter_name):
 # Please Note that the function name should be in snake case and the parameters , local variables in the same convention 
 import re
 import pandas as pd
+import seaborn as sns
+
+
 def get_columns_values(text:str) -> dict:
     """ 
     this function takes text and return dictionary of key value based on the given text
@@ -42,4 +45,19 @@ def one_hot_encoding(data:pd.DataFrame,column:str,dictionary:dict)->pd.DataFrame
     data = data.drop(column, axis=1) # drop the old column
     return data
     
-    
+def count_plot_percentage(data, feature):
+    """ Plot count(frequency) for feature's values along with their percentage written on each bar
+
+    Args:
+        data (pd.DataFrame): data frame
+        feature (str): column name
+    """
+    ax = sns.countplot(x=data[feature])
+
+    # Add count on each plot
+    total = data.shape[0]
+    for p in ax.patches:
+        percentage = f'{(100 * p.get_height()/total):.1f}%'
+        x = p.get_x() + p.get_width() / 2 - 0.1
+        y = p.get_y() + p.get_height()
+        ax.annotate(percentage, (x, y))
