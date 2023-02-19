@@ -9,8 +9,13 @@ def function_name(parameter_name):
 import seaborn as sns
 
 
-
 def count_plot_percentage(data, feature):
+    """ Plot count(frequency) for feature's values along with their percentage written on each bar
+
+    Args:
+        data (pd.DataFrame): data frame
+        feature (str): column name
+    """
     ax = sns.countplot(x=data[feature])
 
     # Add count on each plot
