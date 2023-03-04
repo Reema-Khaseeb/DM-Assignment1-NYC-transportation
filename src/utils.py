@@ -6,10 +6,17 @@ def function_name(parameter_name):
     return
 """
 # Please Note that the function name should be in snake case and the parameters , local variables in the same convention 
-import re
+
+# standard libraries
+import re 
+# third-party libraries alphabetically
+import numpy as np
 import pandas as pd
 import seaborn as sns
-
+import matplotlib.pyplot as plt
+import plotly.express as px
+from sklearn.neighbors import NearestNeighbors
+from sklearn.decomposition import PCA
 
 def get_columns_values(text:str) -> dict:
     """ 
@@ -61,3 +68,41 @@ def count_plot_percentage(data, feature):
         x = p.get_x() + p.get_width() / 2 - 0.1
         y = p.get_y() + p.get_height()
         ax.annotate(percentage, (x, y))
+
+def get_kdist_plot(X=None, k=None, radius_neighbors=1.0):
+
+    neighbors = NearestNeighbors(n_neighbors=k, radius=radius_neighbors).fit(X)
+
+    # For each point, compute distances to its k-nearest neighbors
+    distances, indices = neighbors.kneighbors(X) 
+                                       
+    distances = np.sort(distances, axis=0)
+    distances = distances[:, k-1]
+
+    # Plot the sorted K-nearest neighbor distance for each point in the dataset
+    plt.figure(figsize=(8,8))
+    plt.plot(distances)
+    plt.xlabel('Points/Objects in the dataset', fontsize=12)
+    plt.ylabel(f'Sorted {k}-nearest neighbor distance', fontsize=12)
+    plt.grid(True, linestyle="--", color='black', alpha=0.4)
+    plt.show()
+    plt.close()
+
+def make_count_plot(data):
+    bar_data = pd.DataFrame(data["labels"].value_counts()).reset_index().rename(columns={"index":"label", "labels":"count"})
+    fig = px.bar(bar_data, x="label", y="count", color="label", title="Count for each cluster")
+    fig.show()
+
+def make_3d_viz(data, labels):
+    n_components = 3
+    pca = PCA(n_components=n_components)
+    pca.fit(data)
+
+    data = pd.DataFrame(pca.transform(data), 
+                        columns=([f"PC {i + 1}" for i in range(n_components)]))
+    data['Labels'] = labels
+    data['Labels'] = data['Labels'].astype(str)
+
+    fig = px.scatter_3d(data, x='PC 1', y='PC 2', z='PC 3',
+                color=data['Labels'])
+    fig.show()
