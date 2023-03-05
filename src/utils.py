@@ -9,7 +9,10 @@ def function_name(parameter_name):
 import re
 import pandas as pd
 import seaborn as sns
-
+import matplotlib.pyplot as plt
+import plotly.express as px
+from sklearn.neighbors import NearestNeighbors
+from sklearn.decomposition import PCA
 
 def get_columns_values(text:str) -> dict:
     """ 
@@ -38,6 +41,7 @@ def one_hot_encoding(data:pd.DataFrame,column:str,dictionary:dict)->pd.DataFrame
         data[column] # if the coulmn name is invalid return the data as it is
     except Exception:
         return data
+    
     data[column] = data[column].astype(str) # convert the coulmn to str type
     data[column] = data[column].map(dictionary) # map each value in the cell to the value on the dict
     one_hot = pd.get_dummies(data[column], prefix=column) # create columns and fill it with 0 and 1 based on the cell value
@@ -61,3 +65,42 @@ def count_plot_percentage(data, feature):
         x = p.get_x() + p.get_width() / 2 - 0.1
         y = p.get_y() + p.get_height()
         ax.annotate(percentage, (x, y))
+        
+        
+def get_kdist_plot(X=None, k=None, radius_neighbors=1.0):
+
+    neighbors = NearestNeighbors(n_neighbors=k, radius=radius_neighbors).fit(X)
+
+    # For each point, compute distances to its k-nearest neighbors
+    distances, indices = neighbors.kneighbors(X) 
+
+    distances = np.sort(distances, axis=0)
+    distances = distances[:, k-1]
+
+    # Plot the sorted K-nearest neighbor distance for each point in the dataset
+    plt.figure(figsize=(8,8))
+    plt.plot(distances)
+    plt.xlabel('Points/Objects in the dataset', fontsize=12)
+    plt.ylabel(f'Sorted {k}-nearest neighbor distance', fontsize=12)
+    plt.grid(True, linestyle="--", color='black', alpha=0.4)
+    plt.show()
+    plt.close()
+
+def make_count_plot(data):
+    bar_data = pd.DataFrame(data["labels"].value_counts()).reset_index().rename(columns={"index":"label", "labels":"count"})
+    fig = px.bar(bar_data, x="label", y="count", color="label", title="Count for each cluster")
+    fig.show()
+
+def make_3d_viz(data, labels):
+    n_components = 3
+    pca = PCA(n_components=n_components)
+    pca.fit(data)
+
+    data = pd.DataFrame(pca.transform(data), 
+                        columns=([f"PC {i + 1}" for i in range(n_components)]))
+    data['Labels'] = labels
+    data['Labels'] = data['Labels'].astype(str)
+
+    fig = px.scatter_3d(data, x='PC 1', y='PC 2', z='PC 3',
+                color=data['Labels'])
+    fig.show()
