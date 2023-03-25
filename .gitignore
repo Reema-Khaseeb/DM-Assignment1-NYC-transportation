@@ -1,2 +1,36 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*/__pycache__/
+*.py[cod]
+
+
+# Jupyter Notebook
 .ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+.Python
+build/
+*.egg-info/
+.installed.cfg
+*.egg
+lib/
+
+
+dist/
+*.log
